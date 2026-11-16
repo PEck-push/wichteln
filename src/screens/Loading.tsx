@@ -19,7 +19,7 @@ export function Loading({ onDone }: { onDone: (s: PublicState | null) => void })
       [1, () => fetchState()],
       ...PEOPLE.flatMap((p) => [
         [0.5, () => loadImage(CHARACTERS[p].image)] as [number, () => Promise<unknown>],
-        [0.5, () => fetch(CHARACTERS[p].audio).then((r) => (r.ok ? r.blob() : null))] as [number, () => Promise<unknown>],
+        [0.5, () => fetch(CHARACTERS[p].audio).then((r) => (r.ok ? r.blob() : null)).catch(() => null)] as [number, () => Promise<unknown>],
       ]),
     ]
     const total = tasks.reduce((s, [w]) => s + w, 0)
