@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Avatar } from '../components/Avatar'
-import { Bow, Garland } from '../components/Decor'
+import { Garland } from '../components/Decor'
 import { PEOPLE, type Person } from '../characters'
 import type { Saved } from '../lib/memory'
 
@@ -24,7 +24,7 @@ export function PickName({ done, saved, onPick, onShowSaved, onPrivacy }: Props)
       </header>
 
       <div className="pick__grid" role="radiogroup" aria-label="Ich bin">
-        {PEOPLE.map((p, i) => {
+        {PEOPLE.map((p) => {
           const isDone = done.includes(p)
           const active = sel === p
           return (
@@ -33,13 +33,11 @@ export function PickName({ done, saved, onPick, onShowSaved, onPrivacy }: Props)
               role="radio"
               aria-checked={active}
               disabled={isDone}
-              className={`pcard pcard--${i % 3} ${active ? 'is-active' : ''} ${isDone ? 'is-done' : ''}`}
+              className={`pcard ${active ? 'is-active' : ''} ${isDone ? 'is-done' : ''}`}
               onClick={() => setSel(p)}
             >
-              <span className="pcard__ribbon" aria-hidden="true" />
-              <Bow className="pcard__bow" />
               <Avatar person={p} size={64} className="pcard__avatar" />
-              <span className="pcard__tag"><span className="display pcard__name">{p}</span></span>
+              <span className="display pcard__name">{p}</span>
               {isDone && (
                 <span className="pcard__lock" title="hat schon gezogen">
                   <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
