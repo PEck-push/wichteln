@@ -1,8 +1,9 @@
 import type { Person } from '../characters'
+import { TEST_MODE } from './mode'
 
 // Strictly functional device memory (no tracking): your own name, result and re-open token.
 export type Saved = { me: Person; to: Person; token: string }
-const KEY = 'wichteln26'
+const KEY = TEST_MODE ? 'wichteln26-test' : 'wichteln26'
 
 export function loadSaved(): Saved | null {
   try {

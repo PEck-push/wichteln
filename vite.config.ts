@@ -12,10 +12,12 @@ function devApi(): Plugin {
         let raw = ''
         for await (const c of req) raw += c
         const body = raw ? JSON.parse(raw) : null
-        const path = req.url.split('?')[0]
+        const [path, qs] = req.url.split('?')
+        const test = new URLSearchParams(qs).get('test') === '1'
         const r =
-          path === '/api/state' && req.method === 'GET' ? await h.getState()
-          : path === '/api/draw' && req.method === 'POST' ? await h.postDraw(body)
+          path === '/api/state' && req.method === 'GET' ? await h.getState(test)
+          : path === '/api/draw' && req.method === 'POST' ? await h.postDraw(body, test)
+          : path === '/api/test-reset' && req.method === 'POST' ? await h.postTestReset()
           : path === '/api/reset' && req.method === 'POST' ? await h.postReset((req.headers['x-admin-key'] as string) ?? null)
           : { status: 404, body: { error: 'not found' } }
         res.statusCode = r.status

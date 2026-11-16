@@ -12,15 +12,15 @@ function publicState(state: State) {
   return { people: PEOPLE, done: pairs.map(([giver]) => giver) }
 }
 
-export async function getState(): Promise<Res> {
-  const { state } = await getStore().read()
+export async function getState(test = false): Promise<Res> {
+  const { state } = await getStore(test).read()
   return ok(publicState(state))
 }
 
-export async function postDraw(body: unknown): Promise<Res> {
+export async function postDraw(body: unknown, test = false): Promise<Res> {
   const { name, token } = (body ?? {}) as { name?: unknown; token?: unknown }
   if (!isPerson(name)) return err(400, 'unknown name')
-  const store = getStore()
+  const store = getStore(test)
   for (let attempt = 0; attempt < 8; attempt++) {
     const { raw, state } = await store.read()
     const existing = state.pairs[name]
@@ -41,6 +41,12 @@ export async function postDraw(body: unknown): Promise<Res> {
     // someone else drew at the same moment: retry with fresh state
   }
   return err(503, 'busy, try again')
+}
+
+/** Test data only: anyone may reset it, the live draw is untouched. */
+export async function postTestReset(): Promise<Res> {
+  await getStore(true).reset()
+  return ok({ reset: true, test: true })
 }
 
 export async function postReset(adminKey: string | null): Promise<Res> {

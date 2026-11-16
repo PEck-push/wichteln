@@ -499,3 +499,20 @@
 .pcard__avatar, .pcard .avatar { width: clamp(64px, 11cqh, 116px) !important; height: clamp(64px, 11cqh, 116px) !important; }
 .pcard__name { padding: 0.1em 0.2em 0; line-height: 1; }
 .pcard__lock { top: clamp(32px, 5.5cqh, 58px); }
+
+/* ---------- Test mode bar ---------- */
+.testbar {
+  position: absolute; z-index: 25;
+  left: 50%; bottom: calc(var(--s-2) + var(--safe-b)); transform: translateX(-50%);
+  display: flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-1) var(--s-1) var(--s-1) var(--s-3);
+  border-radius: var(--r-btn);
+  background: rgba(20, 20, 20, 0.78);
+  color: #ffd35e; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.testbar button {
+  border: 0; border-radius: var(--r-btn);
+  min-height: 32px; padding: 0 var(--s-3);
+  background: #ffd35e; color: #2b1a12; font-size: 13px; font-weight: 700; cursor: pointer;
+}

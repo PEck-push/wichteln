@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CHARACTERS, PEOPLE, type Person } from './characters'
-import { DrawError, draw, fetchState, type PublicState } from './lib/api'
+import { DrawError, draw, fetchState, resetTest, type PublicState } from './lib/api'
+import { TEST_MODE } from './lib/mode'
 import { enterFullscreen, playVoice, startMusic, stopVoice } from './lib/audio'
 import { forget, loadSaved, save, type Saved } from './lib/memory'
 import { Loading } from './screens/Loading'
@@ -148,6 +149,24 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
         {step !== 'loading' && <MuteToggle />}
+        {TEST_MODE && step !== 'loading' && (
+          <div className="testbar">
+            <span>Testmodus</span>
+            <button
+              onClick={async () => {
+                await resetTest()
+                forget()
+                setSaved(null)
+                setMe(null)
+                await refresh()
+                setStep('pick')
+                flash('Test zurückgesetzt – alle Namen wieder frei.')
+              }}
+            >
+              Zurücksetzen
+            </button>
+          </div>
+        )}
         <AnimatePresence>
           {toast && (
             <motion.div className="toast" role="status" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>

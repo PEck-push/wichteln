@@ -4,7 +4,6 @@ import type { Person } from './draw.js'
 export type Pair = { to: Person; token: string }
 export type State = { pairs: Partial<Record<Person, Pair>> }
 
-const KEY = 'wichteln26:state'
 // Data deletes itself after the season (DSGVO: Speicherbegrenzung, Art. 5 Abs. 1 lit. e)
 const TTL_SECONDS = 60 * 60 * 24 * 90
 
@@ -42,29 +41,35 @@ return 0`
 
 class UpstashStore implements Store {
   private redis: Redis
-  constructor(redis: Redis) {
+  private key: string
+  constructor(redis: Redis, key: string) {
     this.redis = redis
+    this.key = key
   }
   async read() {
-    const raw = (await this.redis.get<string>(KEY)) ?? ''
+    const raw = (await this.redis.get<string>(this.key)) ?? ''
     return { raw, state: parse(raw || null) }
   }
   async cas(oldRaw: string, next: State) {
-    const r = await this.redis.eval(CAS_SCRIPT, [KEY], [oldRaw, JSON.stringify(next), String(TTL_SECONDS)])
+    const r = await this.redis.eval(CAS_SCRIPT, [this.key], [oldRaw, JSON.stringify(next), String(TTL_SECONDS)])
     return Number(r) === 1
   }
   async reset() {
-    await this.redis.del(KEY)
+    await this.redis.del(this.key)
   }
 }
 
-let store: Store | undefined
-export function getStore(): Store {
-  if (store) return store
+// Test mode lives in its own key: it can never touch the real draw.
+const stores: Partial<Record<'live' | 'test', Store>> = {}
+export function getStore(test = false): Store {
+  const mode = test ? 'test' : 'live'
+  const existing = stores[mode]
+  if (existing) return existing
   const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN
-  store = url && token
-    ? new UpstashStore(new Redis({ url, token, automaticDeserialization: false }))
+  const store = url && token
+    ? new UpstashStore(new Redis({ url, token, automaticDeserialization: false }), `wichteln26:${mode}`)
     : new MemoryStore()
+  stores[mode] = store
   return store
 }

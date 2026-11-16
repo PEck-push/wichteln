@@ -24,6 +24,8 @@ Reset lokal: `ADMIN_KEY=dev npm run dev`, dann `curl -XPOST -H 'x-admin-key: dev
 3. Env-Variable `ADMIN_KEY` (langer Zufallswert) setzen.
 4. Deploy, Link per WhatsApp an alle schicken.
 
+Testmodus: `https://<domain>/?test=1` (eigene Testdaten, Knopf „Zurücksetzen“ in der App).
+
 Neue Runde / Löschen: `curl -XPOST -H "x-admin-key: $ADMIN_KEY" https://<domain>/api/reset`.
 Ohne Reset löschen sich die Daten nach 90 Tagen selbst.
 
