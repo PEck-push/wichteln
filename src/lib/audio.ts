@@ -30,6 +30,12 @@ export async function startMusic() {
     return
   }
   ramp(muted ? 0 : MUSIC_LEVEL, 1.2)
+  void loadSfx()
+}
+export const hasSfx = (name: Sfx) => Boolean(buffers[name])
+/** Duck the background music while an effect plays. */
+export function duck(on: boolean) {
+  ramp(muted ? 0 : on ? DUCK_LEVEL * 2 : MUSIC_LEVEL, on ? 0.3 : 1.2)
 }
 
 function ramp(to: number, seconds: number) {
@@ -75,7 +81,51 @@ export function stopVoice() {
   }
 }
 
-/** Short wooden tick for wheel segments. */
+// Sound effects decoded into Web Audio buffers (reliable timing, works on iOS once unlocked).
+const SFX = { wheel: '/sfx/wheel.mp3', win: '/sfx/win.mp3' } as const
+type Sfx = keyof typeof SFX
+const buffers: Partial<Record<Sfx, AudioBuffer>> = {}
+let sfxSource: AudioBufferSourceNode | null = null
+
+/** Decode effects after the first gesture (call from startMusic). */
+async function loadSfx() {
+  const c = ensure()
+  await Promise.all(
+    (Object.keys(SFX) as Sfx[]).map(async (k) => {
+      if (buffers[k]) return
+      try {
+        const data = await (await fetch(SFX[k])).arrayBuffer()
+        buffers[k] = await c.decodeAudioData(data)
+      } catch {
+        /* effect missing: stay silent */
+      }
+    }),
+  )
+}
+
+export function playSfx(name: Sfx, volume = 1) {
+  if (!ctx || muted) return
+  const buf = buffers[name]
+  if (!buf) return
+  stopSfx()
+  const src = ctx.createBufferSource()
+  const g = ctx.createGain()
+  g.gain.value = volume
+  src.buffer = buf
+  src.connect(g).connect(ctx.destination)
+  src.start()
+  sfxSource = src
+}
+export function stopSfx() {
+  try {
+    sfxSource?.stop()
+  } catch {
+    /* already stopped */
+  }
+  sfxSource = null
+}
+
+/** Short wooden tick (fallback if the wheel sound could not load). */
 export function tick() {
   if (!ctx || muted) return
   const t = ctx.currentTime

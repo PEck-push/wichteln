@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Wheel } from '../components/Wheel'
 import { Garland } from '../components/Decor'
 import type { Person } from '../characters'
-import { chime, haptic, tick } from '../lib/audio'
+import { chime, duck, hasSfx, haptic, playSfx, tick } from '../lib/audio'
 
 type Props = { names: Person[]; result: Person; onDone: () => void }
 
-const DURATION = 5600
+// matches the length of the wheel sound (ticks slowing down, ~5.5 s)
+const DURATION = 5500
 const SPINS = 6
 // ease-out without overshoot (tasteskill: no bounce)
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 4)
@@ -26,6 +27,9 @@ export function Spin({ names, result, onDone }: Props) {
     setRest(target)
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const duration = reduce ? 600 : DURATION
+    const withSound = hasSfx('wheel')
+    duck(true)
+    if (withSound) playSfx('wheel')
     let raf = 0
     let lastSeg = 0
     const start = performance.now()
@@ -36,19 +40,21 @@ export function Spin({ names, result, onDone }: Props) {
       const s = Math.floor((r + seg / 2) / seg)
       if (s !== lastSeg) {
         lastSeg = s
-        tick()
+        if (!withSound) tick()
         haptic(6)
       }
       if (t < 1) raf = requestAnimationFrame(frame)
       else {
         setPhase('stop')
-        chime()
+        if (hasSfx('win')) playSfx('win', 0.9)
+        else chime()
+        setTimeout(() => duck(false), 3200)
         haptic(30)
         setTimeout(() => done.current(), 1100)
       }
     }
     raf = requestAnimationFrame(frame)
-    return () => cancelAnimationFrame(raf)
+    return () => { cancelAnimationFrame(raf); duck(false) }
   }, [names, result])
 
   return (
