@@ -1,6 +1,6 @@
 import type { Person } from '../characters'
 
-export type PublicState = { people: Person[]; done: Person[]; drawn: Person[] }
+export type PublicState = { people: Person[]; done: Person[] }
 
 export async function fetchState(): Promise<PublicState> {
   const r = await fetch('/api/state', { cache: 'no-store' })

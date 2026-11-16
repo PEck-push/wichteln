@@ -8,12 +8,8 @@ const err = (status: number, error: string): Res => ({ status, body: { error } }
 
 function publicState(state: State) {
   const pairs = Object.entries(state.pairs)
-  // Only who has already drawn and which names are taken — never who drew whom.
-  return {
-    people: PEOPLE,
-    done: pairs.map(([giver]) => giver),
-    drawn: pairs.map(([, p]) => p!.to),
-  }
+  // Only who has already drawn — never which names are taken or who drew whom.
+  return { people: PEOPLE, done: pairs.map(([giver]) => giver) }
 }
 
 export async function getState(): Promise<Res> {

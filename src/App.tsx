@@ -27,7 +27,7 @@ export default function App() {
   const [step, setStep] = useState<Step>('loading')
   const [state, setState] = useState<PublicState | null>(null)
   const [me, setMe] = useState<Person | null>(null)
-  const [wheel, setWheel] = useState<{ names: Person[]; locked: Person[]; to: Person } | null>(null)
+  const [wheel, setWheel] = useState<{ names: Person[]; to: Person } | null>(null)
   const [saved, setSaved] = useState<Saved | null>(() => loadSaved())
   const [fresh, setFresh] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -81,15 +81,14 @@ export default function App() {
     setBusy(true)
     stopVoice()
     try {
-      const before = (await refresh()) ?? state
       const { to, token } = await draw(me)
+      // every other name stays on the wheel; the server alone decides where it stops
       const names = PEOPLE.filter((p) => p !== me)
-      const locked = (before?.drawn ?? []).filter((p) => p !== to)
       const s: Saved = { me, to, token }
       save(s)
       setSaved(s)
       setFresh(true)
-      setWheel({ names, locked, to })
+      setWheel({ names, to })
       setStep('spin')
     } catch (e) {
       if (e instanceof DrawError && e.status === 409) {
@@ -141,7 +140,7 @@ export default function App() {
               <Greeting me={me} busy={busy} onGo={onGo} onBack={() => { stopVoice(); setStep('pick') }} />
             )}
             {step === 'spin' && wheel && me && (
-              <Spin names={wheel.names} locked={wheel.locked} result={wheel.to} onDone={() => setStep('result')} />
+              <Spin names={wheel.names} result={wheel.to} onDone={() => setStep('result')} />
             )}
             {resultFor && (
               <Result me={resultFor.me} to={resultFor.to} fresh={fresh} onClose={() => { setFresh(false); void refresh(); setStep('hero') }} />

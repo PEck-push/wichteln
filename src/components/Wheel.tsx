@@ -1,6 +1,6 @@
 import type { Person } from '../characters'
 
-type Props = { names: Person[]; locked: Person[]; rotation: number; spinning: boolean }
+type Props = { names: Person[]; rotation: number; spinning: boolean; restRotation?: number }
 
 const R = 150
 const polar = (deg: number, r = R) => {
@@ -15,7 +15,7 @@ const PAPER = [
 ] as const
 
 /** Layered SVG wheel: metallic rim, shaded wrapping-paper segments, glowing bulbs, gold hub. */
-export function Wheel({ names, locked, rotation, spinning }: Props) {
+export function Wheel({ names, rotation, spinning, restRotation = 0 }: Props) {
   const seg = 360 / names.length
   const bulbs = 20
   return (
@@ -39,10 +39,6 @@ export function Wheel({ names, locked, rotation, spinning }: Props) {
           ))}
           <pattern id="stripes" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
             <rect width="4" height="10" fill="#fff" />
-          </pattern>
-          <pattern id="frost" width="14" height="14" patternUnits="userSpaceOnUse">
-            <circle cx="3" cy="3" r="1.3" fill="#fff" />
-            <circle cx="10" cy="9" r="0.9" fill="#fff" />
           </pattern>
           <radialGradient id="depth" cx="0" cy="0" r={R} gradientUnits="userSpaceOnUse">
             <stop offset=".72" stopColor="#000" stopOpacity="0" />
@@ -91,37 +87,25 @@ export function Wheel({ names, locked, rotation, spinning }: Props) {
             const [x1, y1] = polar(a1)
             const d = `M0 0 L${x0} ${y0} A${R} ${R} 0 ${seg > 180 ? 1 : 0} 1 ${x1} ${y1} Z`
             const k = i % PAPER.length
-            const isLocked = locked.includes(name)
             const mid = a0 + seg / 2
-            const flip = mid > 90 && mid < 270
+            // orient labels for where the wheel comes to rest, so the winner reads upright at the pointer
+            const screen = (((mid + restRotation) % 360) + 360) % 360
+            const flip = screen > 90 && screen < 270
             return (
               <g key={name}>
                 <path d={d} fill={`url(#paper${k})`} />
                 <path d={d} fill="url(#stripes)" opacity={k === 2 ? 0.18 : 0.07} />
-                {isLocked && (
-                  <>
-                    <path d={d} fill="#14251d" opacity=".62" />
-                    <path d={d} fill="url(#frost)" opacity=".35" />
-                  </>
-                )}
                 <g transform={`rotate(${mid}) translate(0 ${-R * 0.64}) rotate(${flip ? 180 : 0})`}>
                   <text
                     className="wheel__label"
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fill={isLocked ? 'rgba(255,248,238,.45)' : PAPER[k][3]}
+                    fill={PAPER[k][3]}
                     fontSize={names.length > 5 ? 26 : 30}
-                    filter={isLocked || k === 2 ? undefined : 'url(#txt)'}
+                    filter={k === 2 ? undefined : 'url(#txt)'}
                   >
                     {name}
                   </text>
-                  {isLocked && (
-                    <g transform={`translate(0 ${flip ? -30 : 30})`}>
-                      <circle r="11" fill="url(#hubGold)" stroke="#7a4d0e" strokeWidth="1" />
-                      <rect x="-5" y="-2" width="10" height="7.5" rx="1.6" fill="#5c3a08" />
-                      <path d="M-3.2 -2v-2a3.2 3.2 0 0 1 6.4 0v2" fill="none" stroke="#5c3a08" strokeWidth="1.8" />
-                    </g>
-                  )}
                 </g>
               </g>
             )

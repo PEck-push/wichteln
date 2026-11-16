@@ -4,16 +4,17 @@ import { Garland } from '../components/Decor'
 import type { Person } from '../characters'
 import { chime, haptic, tick } from '../lib/audio'
 
-type Props = { names: Person[]; locked: Person[]; result: Person; onDone: () => void }
+type Props = { names: Person[]; result: Person; onDone: () => void }
 
 const DURATION = 5600
 const SPINS = 6
 // ease-out without overshoot (tasteskill: no bounce)
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 4)
 
-export function Spin({ names, locked, result, onDone }: Props) {
+export function Spin({ names, result, onDone }: Props) {
   const [rot, setRot] = useState(0)
   const [phase, setPhase] = useState<'spin' | 'stop'>('spin')
+  const [rest, setRest] = useState(0)
   const done = useRef(onDone)
   done.current = onDone
 
@@ -22,6 +23,7 @@ export function Spin({ names, locked, result, onDone }: Props) {
     const i = names.indexOf(result)
     const offset = (Math.random() - 0.5) * seg * 0.6 // land somewhere inside the segment, never on a line
     const target = SPINS * 360 + ((((-(i * seg + seg / 2 + offset)) % 360) + 360) % 360)
+    setRest(target)
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const duration = reduce ? 600 : DURATION
     let raf = 0
@@ -58,9 +60,8 @@ export function Spin({ names, locked, result, onDone }: Props) {
         <p className="display title spin__live" aria-live="polite">{phase === 'stop' ? result : ' '}</p>
       </header>
       <div className="spin__stage">
-        <Wheel names={names} locked={locked} rotation={rot} spinning={phase === "spin"} />
+        <Wheel names={names} rotation={rot} spinning={phase === "spin"} restRotation={rest} />
       </div>
-      <p className="spin__note">Gesperrte Namen sind schon vergeben.</p>
     </div>
   )
 }
