@@ -166,3 +166,7 @@ img { display: block; max-width: 100%; }
     transition-property: opacity, color, background-color !important;
   }
 }
+
+/* All headings use the supplied display font */
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; letter-spacing: 0.01em; }
+.sheet h2 { font-size: 34px; }

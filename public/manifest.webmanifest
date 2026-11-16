@@ -1,0 +1,11 @@
+{
+  "name": "Wichteln ’26",
+  "short_name": "Wichteln",
+  "start_url": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#0f3323",
+  "theme_color": "#0f3323",
+  "icons": [{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }]
+}

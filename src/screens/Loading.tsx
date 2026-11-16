@@ -54,7 +54,7 @@ export function Loading({ onDone }: { onDone: (s: PublicState | null) => void })
     <div className="screen loading">
       <div className="loading__bg" aria-hidden="true" />
       <div className="loading__body">
-        <h1 className="display loading__title">Wichteln ’26</h1>
+        <h1 className="display title loading__title">Wichteln ’26</h1>
         <p className="loading__sub">Der Wichtel steht grad vom Sessel auf …</p>
         <CandyCaneBar value={progress} />
         <p className="loading__pct" aria-hidden="true">{Math.round(progress * 100)} %</p>

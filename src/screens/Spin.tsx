@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Wheel } from '../components/Wheel'
+import { Garland } from '../components/Decor'
 import type { Person } from '../characters'
 import { chime, haptic, tick } from '../lib/audio'
 
@@ -51,12 +52,13 @@ export function Spin({ names, locked, result, onDone }: Props) {
   return (
     <div className={`screen spin is-${phase}`}>
       <div className="backdrop" aria-hidden="true" />
+      <Garland />
       <header className="spin__head">
         <p className="spin__kicker">Du beschenkst heuer …</p>
-        <p className="display spin__live" aria-live="polite">{phase === 'stop' ? result : ' '}</p>
+        <p className="display title spin__live" aria-live="polite">{phase === 'stop' ? result : ' '}</p>
       </header>
       <div className="spin__stage">
-        <Wheel names={names} locked={locked} rotation={rot} />
+        <Wheel names={names} locked={locked} rotation={rot} spinning={phase === "spin"} />
       </div>
       <p className="spin__note">Gesperrte Namen sind schon vergeben.</p>
     </div>

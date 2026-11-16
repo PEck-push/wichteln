@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import { Avatar } from '../components/Avatar'
+import { Garland, Wreath } from '../components/Decor'
 import type { Person } from '../characters'
 
 const enter = { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }
@@ -21,17 +22,19 @@ export function Result({ me, to, fresh, onClose }: { me: Person; to: Person; fre
   return (
     <div className="screen result">
       <div className="backdrop" aria-hidden="true" />
+      <Garland />
       <div className="result__body">
         <motion.p className="result__kicker" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={enter}>
           {me}, du beschenkst heuer
         </motion.p>
-        <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...enter, duration: 0.9 }}>
-          <Avatar person={to} size={180} className="result__avatar" />
+        <motion.div className="result__burst-wrap" initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...enter, duration: 0.9 }}>
+          <span className="result__burst" aria-hidden="true" />
+          <Wreath size={210}><Avatar person={to} size={140} className="result__avatar" /></Wreath>
         </motion.div>
-        <motion.h1 className="display result__name" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.12 }}>
+        <motion.h1 className="display title result__name" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.12 }}>
           {to}
         </motion.h1>
-        <motion.p className="result__secret" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.24 }}>
+        <motion.p className="result__secret tag" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.24 }}>
           Psst – des bleibt unter uns!
         </motion.p>
       </div>

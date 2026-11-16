@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CHARACTERS, PEOPLE, type Person } from './characters'
 import { DrawError, draw, fetchState, type PublicState } from './lib/api'
-import { playVoice, startMusic, stopVoice } from './lib/audio'
+import { enterFullscreen, playVoice, startMusic, stopVoice } from './lib/audio'
 import { forget, loadSaved, save, type Saved } from './lib/memory'
 import { Loading } from './screens/Loading'
 import { Hero } from './screens/Hero'
@@ -63,6 +63,7 @@ export default function App() {
   }, [])
 
   const onStart = () => {
+    enterFullscreen()
     void startMusic()
     void refresh()
     setStep('pick')

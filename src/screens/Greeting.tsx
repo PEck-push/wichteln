@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Avatar } from '../components/Avatar'
+import { Garland, Wreath } from '../components/Decor'
 import { CHARACTERS, type Person } from '../characters'
 import { playVoice } from '../lib/audio'
 
@@ -9,16 +10,14 @@ export function Greeting({ me, busy, onGo, onBack }: { me: Person; busy: boolean
   return (
     <div className="screen greet">
       <div className="backdrop" aria-hidden="true" />
+      <Garland />
       <div className="greet__body">
         <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}>
-          <Avatar person={me} size={196} className="greet__avatar" />
+          <Wreath size={220}><Avatar person={me} size={150} className="greet__avatar" /></Wreath>
         </motion.div>
-        <motion.h1 className="display greet__name" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.15 }}>
+        <motion.h1 className="display title greet__name" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.15 }}>
           Servas, {me}!
         </motion.h1>
-        <motion.p className="greet__bubble" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.27 }}>
-          „{CHARACTERS[me].greeting}“
-        </motion.p>
       </div>
       <motion.div className="dock" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...enter, delay: 0.39 }}>
         <button className="btn btn--primary btn--go" onClick={onGo} disabled={busy}>

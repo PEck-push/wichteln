@@ -1,89 +1,184 @@
 import type { Person } from '../characters'
 
-const COLORS = ['#c8262c', '#1d5a3c', '#e9dcc6', '#a61e23', '#246b48', '#f3e8d4']
-const INK = ['#fff8ee', '#fff8ee', '#2b1a12', '#fff8ee', '#fff8ee', '#2b1a12']
-
-type Props = { names: Person[]; locked: Person[]; rotation: number }
+type Props = { names: Person[]; locked: Person[]; rotation: number; spinning: boolean }
 
 const R = 150
 const polar = (deg: number, r = R) => {
   const a = ((deg - 90) * Math.PI) / 180
   return [r * Math.cos(a), r * Math.sin(a)] as const
 }
+// wrapping-paper palette: [inner, mid, outer, ink]
+const PAPER = [
+  ['#7d1015', '#c8262c', '#e8443f', '#fff8ee'],
+  ['#0d3a25', '#1d6b45', '#2f8a5b', '#fff8ee'],
+  ['#c9b48e', '#f4e9d2', '#fffaf0', '#7d1015'],
+] as const
 
-/** Pure SVG wheel. Segment i spans [i*seg, (i+1)*seg] clockwise from 12 o'clock. */
-export function Wheel({ names, locked, rotation }: Props) {
+/** Layered SVG wheel: metallic rim, shaded wrapping-paper segments, glowing bulbs, gold hub. */
+export function Wheel({ names, locked, rotation, spinning }: Props) {
   const seg = 360 / names.length
-  const bulbs = 24
+  const bulbs = 20
   return (
-    <div className="wheel">
-      <svg viewBox="-180 -180 360 360" className="wheel__svg" aria-hidden="true">
+    <div className={`wheel ${spinning ? 'is-spinning' : ''}`}>
+      <svg viewBox="-190 -190 380 380" className="wheel__svg" aria-hidden="true">
         <defs>
-          <radialGradient id="rim" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="#ffe39a" />
-            <stop offset="100%" stopColor="#c8902a" />
+          <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#fff4c8" />
+            <stop offset=".22" stopColor="#e8b04a" />
+            <stop offset=".45" stopColor="#8a5a12" />
+            <stop offset=".62" stopColor="#f6d47e" />
+            <stop offset=".8" stopColor="#b47b1e" />
+            <stop offset="1" stopColor="#fff0b8" />
+          </linearGradient>
+          {PAPER.map(([a, b, c], i) => (
+            <radialGradient key={i} id={`paper${i}`} cx="0" cy="0" r={R} gradientUnits="userSpaceOnUse">
+              <stop offset="0" stopColor={a} />
+              <stop offset=".55" stopColor={b} />
+              <stop offset="1" stopColor={c} />
+            </radialGradient>
+          ))}
+          <pattern id="stripes" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+            <rect width="4" height="10" fill="#fff" />
+          </pattern>
+          <pattern id="frost" width="14" height="14" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.3" fill="#fff" />
+            <circle cx="10" cy="9" r="0.9" fill="#fff" />
+          </pattern>
+          <radialGradient id="depth" cx="0" cy="0" r={R} gradientUnits="userSpaceOnUse">
+            <stop offset=".72" stopColor="#000" stopOpacity="0" />
+            <stop offset="1" stopColor="#000" stopOpacity=".38" />
           </radialGradient>
-          <radialGradient id="hub" cx="40%" cy="35%" r="70%">
-            <stop offset="0%" stopColor="#fff8ee" />
-            <stop offset="100%" stopColor="#e7c98c" />
+          <radialGradient id="bulb" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stopColor="#fffbe8" />
+            <stop offset=".35" stopColor="#ffe08a" />
+            <stop offset=".6" stopColor="#ffb83d" stopOpacity=".55" />
+            <stop offset="1" stopColor="#ff9a1f" stopOpacity="0" />
           </radialGradient>
-          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000" floodOpacity="0.35" />
+          <radialGradient id="hubGold" cx="35%" cy="30%" r="75%">
+            <stop offset="0" stopColor="#fff6d0" />
+            <stop offset=".45" stopColor="#e6ae45" />
+            <stop offset="1" stopColor="#7a4d0e" />
+          </radialGradient>
+          <radialGradient id="hubRed" cx="35%" cy="30%" r="75%">
+            <stop offset="0" stopColor="#ff7a6e" />
+            <stop offset=".5" stopColor="#c8262c" />
+            <stop offset="1" stopColor="#5c0b0f" />
+          </radialGradient>
+          <linearGradient id="glare" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#fff" stopOpacity=".28" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+          <filter id="drop" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="10" stdDeviation="10" floodColor="#000" floodOpacity=".45" />
+          </filter>
+          <filter id="txt" x="-20%" y="-50%" width="140%" height="200%">
+            <feDropShadow dx="0" dy="1.5" stdDeviation="1" floodColor="#000" floodOpacity=".45" />
           </filter>
         </defs>
-        <circle r="172" fill="url(#rim)" filter="url(#soft)" />
-        <circle r="160" fill="#7a1418" />
+
+        {/* metallic rim */}
+        <circle r="182" fill="url(#gold)" filter="url(#drop)" />
+        <circle r="170" fill="none" stroke="#5c3a08" strokeWidth="1.5" opacity=".6" />
+        <circle r="162" fill="#5c0b0f" />
+        <circle r="158" fill="none" stroke="url(#gold)" strokeWidth="3" />
+
+        {/* segments */}
         <g style={{ transform: `rotate(${rotation}deg)` }}>
           {names.map((name, i) => {
             const a0 = i * seg
             const a1 = (i + 1) * seg
             const [x0, y0] = polar(a0)
             const [x1, y1] = polar(a1)
-            const large = seg > 180 ? 1 : 0
+            const d = `M0 0 L${x0} ${y0} A${R} ${R} 0 ${seg > 180 ? 1 : 0} 1 ${x1} ${y1} Z`
+            const k = i % PAPER.length
             const isLocked = locked.includes(name)
             const mid = a0 + seg / 2
-            const color = COLORS[i % COLORS.length]
+            const flip = mid > 90 && mid < 270
             return (
               <g key={name}>
-                <path
-                  d={`M0 0 L${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} Z`}
-                  fill={color}
-                  stroke="#f2c45a"
-                  strokeWidth="2"
-                />
-                {isLocked && <path d={`M0 0 L${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} Z`} fill="#0f3323" opacity="0.55" />}
-                <g transform={`rotate(${mid - 90})`}>
+                <path d={d} fill={`url(#paper${k})`} />
+                <path d={d} fill="url(#stripes)" opacity={k === 2 ? 0.18 : 0.07} />
+                {isLocked && (
+                  <>
+                    <path d={d} fill="#14251d" opacity=".62" />
+                    <path d={d} fill="url(#frost)" opacity=".35" />
+                  </>
+                )}
+                <g transform={`rotate(${mid}) translate(0 ${-R * 0.64}) rotate(${flip ? 180 : 0})`}>
                   <text
                     className="wheel__label"
-                    x={R * 0.56}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fill={isLocked ? 'rgba(255,248,238,0.55)' : INK[i % INK.length]}
-                    fontSize={28}
+                    fill={isLocked ? 'rgba(255,248,238,.45)' : PAPER[k][3]}
+                    fontSize={names.length > 5 ? 26 : 30}
+                    filter={isLocked || k === 2 ? undefined : 'url(#txt)'}
                   >
                     {name}
                   </text>
                   {isLocked && (
-                    <g transform={`translate(${R * 0.92} 0) rotate(90) scale(0.8)`} fill="rgba(255,248,238,0.85)">
-                      <rect x="-8" y="-3" width="16" height="12" rx="2.5" />
-                      <path d="M-5 -3v-3a5 5 0 0 1 10 0v3" fill="none" stroke="rgba(255,248,238,0.85)" strokeWidth="2.4" />
+                    <g transform={`translate(0 ${flip ? -30 : 30})`}>
+                      <circle r="11" fill="url(#hubGold)" stroke="#7a4d0e" strokeWidth="1" />
+                      <rect x="-5" y="-2" width="10" height="7.5" rx="1.6" fill="#5c3a08" />
+                      <path d="M-3.2 -2v-2a3.2 3.2 0 0 1 6.4 0v2" fill="none" stroke="#5c3a08" strokeWidth="1.8" />
                     </g>
                   )}
                 </g>
               </g>
             )
           })}
+          {/* gold separators with studs */}
+          {names.map((_, i) => {
+            const [x, y] = polar(i * seg)
+            const [sx, sy] = polar(i * seg, R - 8)
+            return (
+              <g key={`s${i}`}>
+                <line x1="0" y1="0" x2={x} y2={y} stroke="url(#gold)" strokeWidth="3.5" />
+                <circle cx={sx} cy={sy} r="4.5" fill="url(#hubGold)" stroke="#7a4d0e" strokeWidth=".8" />
+              </g>
+            )
+          })}
         </g>
+
+        {/* depth + glass glare (static, does not rotate) */}
+        <circle r={R} fill="url(#depth)" pointerEvents="none" />
+        <ellipse cx="0" cy="-70" rx="120" ry="70" fill="url(#glare)" pointerEvents="none" />
+
+        {/* marquee bulbs on the rim */}
         {Array.from({ length: bulbs }, (_, i) => {
-          const [x, y] = polar((360 / bulbs) * i, 166)
-          return <circle key={i} cx={x} cy={y} r="3.6" className={`bulb ${i % 2 ? 'bulb--b' : ''}`} />
+          const [x, y] = polar((360 / bulbs) * i, 176)
+          return (
+            <g key={i} className={`bulb ${i % 2 ? 'bulb--b' : 'bulb--a'}`} transform={`translate(${x} ${y})`}>
+              <circle r="11" fill="url(#bulb)" className="bulb__halo" />
+              <circle r="3.8" fill="#fffbe8" stroke="#a8741c" strokeWidth=".8" />
+            </g>
+          )
         })}
-        <circle r="30" fill="url(#hub)" stroke="#c8902a" strokeWidth="3" />
-        <path d="M0 -14 L4 -4 L14 -4 L6 3 L9 13 L0 7 L-9 13 L-6 3 L-14 -4 L-4 -4 Z" fill="#c8262c" />
+
+        {/* ornament hub */}
+        <circle r="36" fill="url(#hubGold)" stroke="#5c3a08" strokeWidth="1.2" filter="url(#drop)" />
+        <circle r="27" fill="url(#hubRed)" />
+        <path d="M0 -15 L4.4 -4.6 L15 -4.6 L6.4 2.4 L9.6 13.4 L0 6.8 L-9.6 13.4 L-6.4 2.4 L-15 -4.6 L-4.4 -4.6 Z" fill="url(#hubGold)" />
+        <ellipse cx="-8" cy="-12" rx="9" ry="5" fill="#fff" opacity=".35" transform="rotate(-30 -8 -12)" />
       </svg>
-      <svg className="wheel__pointer" viewBox="0 0 40 52" aria-hidden="true">
-        <path d="M20 50 L4 18 A17 17 0 1 1 36 18 Z" fill="#f2c45a" stroke="#8a5a12" strokeWidth="2" />
-        <circle cx="20" cy="17" r="7" fill="#c8262c" />
+
+      {/* pointer: a glass bauble with gold cap */}
+      <svg className="wheel__pointer" viewBox="-6 -6 60 84" aria-hidden="true">
+        <defs>
+          <radialGradient id="bauble" cx="35%" cy="30%" r="75%">
+            <stop offset="0" stopColor="#ff8a7e" />
+            <stop offset=".45" stopColor="#d42a30" />
+            <stop offset="1" stopColor="#5c0b0f" />
+          </radialGradient>
+          <linearGradient id="cap" x1="0" x2="1">
+            <stop offset="0" stopColor="#8a5a12" />
+            <stop offset=".5" stopColor="#fff0b8" />
+            <stop offset="1" stopColor="#8a5a12" />
+          </linearGradient>
+        </defs>
+        <path d="M24 72 L8 34 A20 20 0 1 1 40 34 Z" fill="url(#bauble)" stroke="#5c0b0f" strokeWidth="1.5" />
+        <ellipse cx="16" cy="18" rx="6" ry="9" fill="#fff" opacity=".45" transform="rotate(25 16 18)" />
+        <rect x="16" y="-2" width="16" height="9" rx="2" fill="url(#cap)" stroke="#5c3a08" strokeWidth=".8" />
+        <path d="M21 0 a3 3 0 0 1 6 0" fill="none" stroke="#c8902a" strokeWidth="2" transform="translate(0 -2)" />
       </svg>
     </div>
   )

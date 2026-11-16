@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Avatar } from '../components/Avatar'
+import { Bow, Garland } from '../components/Decor'
 import { PEOPLE, type Person } from '../characters'
 import type { Saved } from '../lib/memory'
 
@@ -16,13 +17,14 @@ export function PickName({ done, saved, onPick, onShowSaved, onPrivacy }: Props)
   return (
     <div className="screen pick">
       <div className="backdrop" aria-hidden="true" />
+      <Garland />
       <header className="pick__head">
-        <h1 className="display pick__title">Wer bist du?</h1>
+        <h1 className="display title pick__title">Wer bist du?</h1>
         <p className="pick__sub">{saved ? `Servas ${saved.me}, du hast schon gezogen.` : done.length >= PEOPLE.length ? 'Alle haben gezogen – frohe Weihnachten!' : 'Tipp auf deinen Namen.'}</p>
       </header>
 
       <div className="pick__grid" role="radiogroup" aria-label="Ich bin">
-        {PEOPLE.map((p) => {
+        {PEOPLE.map((p, i) => {
           const isDone = done.includes(p)
           const active = sel === p
           return (
@@ -31,11 +33,13 @@ export function PickName({ done, saved, onPick, onShowSaved, onPrivacy }: Props)
               role="radio"
               aria-checked={active}
               disabled={isDone}
-              className={`pcard ${active ? 'is-active' : ''} ${isDone ? 'is-done' : ''}`}
+              className={`pcard pcard--${i % 3} ${active ? 'is-active' : ''} ${isDone ? 'is-done' : ''}`}
               onClick={() => setSel(p)}
             >
-              <Avatar person={p} size={76} />
-              <span className="display pcard__name">{p}</span>
+              <span className="pcard__ribbon" aria-hidden="true" />
+              <Bow className="pcard__bow" />
+              <Avatar person={p} size={64} className="pcard__avatar" />
+              <span className="pcard__tag"><span className="display pcard__name">{p}</span></span>
               {isDone && (
                 <span className="pcard__lock" title="hat schon gezogen">
                   <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">

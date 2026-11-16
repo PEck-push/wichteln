@@ -116,3 +116,15 @@ export const haptic = (ms = 8) => {
     /* unsupported */
   }
 }
+
+/** Fullscreen on first tap (Android/Chrome). iPhone Safari has no page fullscreen: there the home-screen web app runs fullscreen via the manifest. */
+export function enterFullscreen() {
+  const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void }
+  if (document.fullscreenElement) return
+  try {
+    if (el.requestFullscreen) void el.requestFullscreen({ navigationUI: 'hide' }).catch(() => undefined)
+    else el.webkitRequestFullscreen?.()
+  } catch {
+    /* unsupported */
+  }
+}
