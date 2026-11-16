@@ -1,0 +1,168 @@
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--c-green-deep);
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+#root { height: 100%; }
+
+/* Phone frame: mobile only. On a desktop the app sits in a phone-sized column. */
+.device {
+  position: relative;
+  height: 100dvh;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--c-green-deep);
+}
+.desk-hint { display: none; }
+@media (min-width: 760px) {
+  body {
+    background:
+      radial-gradient(1200px 600px at 50% 0%, rgba(242, 196, 90, 0.10), transparent 60%),
+      var(--c-green-deep);
+  }
+  .device {
+    height: min(100dvh - 72px, 932px);
+    max-width: 430px;
+    margin-top: 24px;
+    border-radius: 44px;
+    box-shadow: 0 0 0 10px #0a2016, 0 30px 80px rgba(0, 0, 0, 0.5);
+  }
+  .desk-hint {
+    display: block;
+    position: fixed;
+    left: 0; right: 0; bottom: 12px;
+    text-align: center;
+    color: rgba(255, 248, 238, 0.6);
+    font-size: 14px;
+  }
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Blurred key art used behind every inner screen */
+.backdrop {
+  position: absolute;
+  inset: -40px;
+  background: url('/bg-tiny.jpg') center / cover no-repeat;
+  filter: blur(18px) saturate(1.1);
+  transform: scale(1.1);
+  z-index: -2;
+}
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 51, 35, 0.55), rgba(15, 51, 35, 0.82));
+}
+
+.display {
+  font-family: var(--f-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+/* ---------- The one button (tasteskill: one shape, one filled action per view) ---------- */
+.btn {
+  appearance: none;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  width: 100%;
+  min-height: var(--btn-h);
+  padding: 0 var(--s-5);
+  border-radius: var(--r-btn);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition:
+    transform var(--m-out) var(--ease),
+    background-color var(--m-out) var(--ease),
+    box-shadow var(--m-out) var(--ease),
+    opacity var(--m-out) var(--ease);
+}
+.btn--primary {
+  background: var(--c-action);
+  color: var(--c-cream);
+  box-shadow: inset 0 0 0 2px rgba(255, 248, 238, 0.9), 0 6px 0 var(--c-red-ink);
+}
+.btn--secondary {
+  background: rgba(255, 248, 238, 0.14);
+  color: var(--c-cream);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 248, 238, 0.5);
+}
+.btn:disabled { opacity: 0.45; cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    transition-duration: var(--m-in);
+  }
+  .btn--primary:not(:disabled):hover { background: color-mix(in srgb, var(--c-action) 86%, var(--c-ink)); }
+  .btn--secondary:not(:disabled):hover { background: rgba(255, 248, 238, 0.22); }
+}
+.btn:not(:disabled):active {
+  transform: translateY(1px) scale(0.985);
+  transition-duration: var(--m-press);
+}
+.btn--primary:not(:disabled):active { box-shadow: inset 0 0 0 2px rgba(255, 248, 238, 0.9), 0 3px 0 var(--c-red-ink); }
+
+.link {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: var(--s-3) var(--s-2);
+  min-height: 44px;
+  color: rgba(255, 248, 238, 0.8);
+  font-size: 15px;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 248, 238, 0.35);
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color var(--m-out) var(--ease);
+}
+.link:active { color: var(--c-cream); }
+
+:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 2px; }
+
+/* Bottom action dock: content above, one action at thumb height */
+.dock {
+  padding: var(--s-4) var(--s-5) calc(var(--s-5) + var(--safe-b));
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color !important;
+  }
+}

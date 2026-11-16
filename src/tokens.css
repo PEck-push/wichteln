@@ -1,0 +1,46 @@
+/* Tokens follow tasteskill (system.md / motion.md): one spacing scale, one radius family,
+   one button, one ease-out without overshoot. */
+@font-face {
+  font-family: 'Jolly Christmas';
+  src: url('/fonts/JollyChristmas.woff2') format('woff2');
+  font-display: block;
+}
+
+:root {
+  /* spacing 4 … 128 */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+
+  /* radius family: round 10 / 16 / 24, buttons pill */
+  --r-sm: 10px; --r-md: 16px; --r-lg: 24px; --r-btn: 999px;
+
+  /* palette taken from the key art */
+  --c-red: #c8262c;
+  --c-red-ink: #9e1b20;
+  --c-green: #1d5a3c;
+  --c-green-deep: #0f3323;
+  --c-gold: #f2c45a;
+  --c-cream: #fff8ee;
+  --c-ink: #2b1a12;
+  --c-ink-soft: rgba(43, 26, 18, 0.66);
+  --c-glass: rgba(255, 248, 238, 0.86);
+  --c-line: rgba(43, 26, 18, 0.12);
+  --c-action: var(--c-red);
+
+  /* type */
+  --f-display: 'Jolly Christmas', Georgia, serif;
+  --f-body: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* buttons */
+  --btn-h: 56px;
+
+  /* motion */
+  --m-in: 150ms; --m-out: 120ms; --m-press: 90ms; --m-panel: 200ms; --m-slide: 240ms;
+  --m-image: 600ms; --m-cycle: 3.2s;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --m-ease-enter: cubic-bezier(.22, 1, .36, 1);
+  --m-ease-io: cubic-bezier(.65, 0, .35, 1);
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
