@@ -528,3 +528,10 @@
 .admin__list li { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: var(--s-2); padding: var(--s-2) 0; border-bottom: 1px solid rgba(255,248,238,0.15); }
 .admin__muted { opacity: 0.6; font-size: 13px; }
 .admin__msg { margin: 0; text-align: center; color: #ffd35e; font-weight: 600; }
+
+/* Spin v2: name + wheel as one group, centred on screen (name space stays reserved) */
+.spin { justify-content: center; gap: var(--s-4); padding-bottom: calc(var(--s-7) + var(--safe-b)); }
+.spin__head { padding-top: calc(var(--s-6) + var(--safe-t)); }
+.spin__stage { flex: 0 0 auto; padding-top: var(--s-4); }
+/* test bar top-left: never covers the hero button or the bottom dock */
+.testbar { top: calc(var(--s-3) + var(--safe-t)); bottom: auto; left: var(--s-3); transform: none; }
