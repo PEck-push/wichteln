@@ -516,3 +516,15 @@
   min-height: 32px; padding: 0 var(--s-3);
   background: #ffd35e; color: #2b1a12; font-size: 13px; font-weight: 700; cursor: pointer;
 }
+
+/* ---------- Admin ---------- */
+.admin { justify-content: center; padding: var(--s-5); overflow: auto; }
+.admin__card { display: flex; flex-direction: column; gap: var(--s-3); padding: var(--s-5); border-radius: var(--r-lg); background: rgba(15, 51, 35, 0.82); color: var(--c-cream); }
+.admin__card .title { font-size: 48px; text-align: center; }
+.admin__label { display: flex; flex-direction: column; gap: var(--s-2); font-size: 14px; }
+.admin__label input { min-height: 48px; padding: 0 var(--s-3); border-radius: var(--r-sm); border: 1.5px solid rgba(255,248,238,0.5); background: rgba(255,248,238,0.1); color: var(--c-cream); font-size: 17px; }
+.admin__btn { min-height: 48px; }
+.admin__list { list-style: none; margin: 0; padding: 0; font-size: 15px; }
+.admin__list li { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: var(--s-2); padding: var(--s-2) 0; border-bottom: 1px solid rgba(255,248,238,0.15); }
+.admin__muted { opacity: 0.6; font-size: 13px; }
+.admin__msg { margin: 0; text-align: center; color: #ffd35e; font-weight: 600; }

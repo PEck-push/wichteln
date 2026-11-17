@@ -26,7 +26,7 @@ Reset lokal: `ADMIN_KEY=dev npm run dev`, dann `curl -XPOST -H 'x-admin-key: dev
 
 Testmodus: `https://<domain>/?test=1` (eigene Testdaten, Knopf „Zurücksetzen“ in der App).
 
-Neue Runde / Löschen: `curl -XPOST -H "x-admin-key: $ADMIN_KEY" https://<domain>/api/reset`.
+Admin-Seite: `https://<domain>/admin-wichtel` (Status, Test- und Echt-Reset; Schlüssel = Env `ADMIN_KEY`).
 Ohne Reset löschen sich die Daten nach 90 Tagen selbst.
 
 ## Assets austauschen
